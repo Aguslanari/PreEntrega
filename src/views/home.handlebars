@@ -1,2 +1,20 @@
-<h1>Hola {{nombreUsuario}}</h1>
-{{>count/count}}
+<div id="userEmail">
+    <h3>Bienvenido {{email}}</h3>
+    <h4>Eres {{userRole}}</h4>
+</div>
+<div class="logout-button-container">
+    <button id="logoutBtn" class="logout-button">Logout</button>
+</div>
+<table class="product-table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Codigo</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Categoria</th>
+        </tr>
+    </thead>
+    <tbody id="products"></tbody>
+</table>

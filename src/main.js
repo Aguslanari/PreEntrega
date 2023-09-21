@@ -4,40 +4,58 @@ import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
 import { __dirname } from './path.js';
 import path from 'path';
-import mongoose from 'mongoose';
+
+
+
 import messageModel from './models/message.models.js';
+import productModel from './models/products.models.js';
+import userModel from './models/users.models.js';
 
 import routerProd from './routes/products.routes.js';
 import routerCart from './routes/carts.routes.js';
 import routerMessage from './routes/messages.routes.js';
-import productModel from './models/products.models.js'; 
+import routerSession from './routes/sessions.routes.js';
+import routerUser from './routes/users.routes.js';
 
-const app = express();
-
-const PORT = 8080;
-
-// Server
-const server = app.listen(PORT, () => {
-	console.log(`Puerto: ${PORT}`);
-});
-
-const io = new Server(server);
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
+import { app, io } from './config/config.js';
 
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.resolve(__dirname, './views'));
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	store: MongoStore.create({
+		mongoUrl: process.env.CONNNECTIONSTRING,
+		mongoOptions: {
+			useNewUrlParser: true,
+			useUnifiedTopology: true
+		},
+		ttl: 600
+	}),
+}));
 
-// DB
-const DB = process.env.CONNNECTIONSTRING;
-mongoose
-	.connect(
-		DB
-	)
-	.then(() => console.log('DB conectada'))
-	.catch(error => console.log(`Error al conectarse con la DB:  ${error}`));
+//Auth para admin
+const authAdmin = (req, res, next) => {
+	if (req.session.email == "admin@admin.com") {
+		return next();
+	}
+	return res.send("No tenes acceso a este contenido");
+}
+
+//Auth para usuarios logueados
+const authUser = (req, res, next) => {
+	if (req.session.login) {
+		return next();
+	}
+	return res.send("No tenes acceso a este contenido");
+}
 
 // Conexión con socket.io
 io.on('connection', socket => {
@@ -79,12 +97,25 @@ io.on('connection', socket => {
 
 // Routes
 app.use('/static', express.static(path.join(__dirname, '/public')));
-
+app.use('/api/products', routerProd);
+app.use('/api/carts', routerCart);
+app.use('/api/messages', routerMessage);
+app.use('/api/users', routerUser)
+app.use('/api/sessions', routerSession)
 app.get('/static', (req, res) => {
 	res.render('index', {
 		rutaCSS: 'index',
 		rutaJS: 'index',
 	});
+});
+
+app.get('/static/home', authUser, (req, res) => {
+    res.render('home', {
+        rutaCSS: "home",
+        rutaJS: "home",
+        email: req.session.email,
+        userRole: req.session.userRole
+    });
 });
 
 app.get('/static/realtimeproducts', (req, res) => {
@@ -108,6 +139,17 @@ app.get('/static/products', (req, res) => {
 	});
 });
 
-app.use('/api/products', routerProd);
-app.use('/api/carts', routerCart);
-app.use('/api/messages', routerMessage);
+app.get('/static/login', (req, res) => {
+    res.render('login', {
+        rutaCSS: "login",
+        rutaJS: "login",
+    });
+});
+
+app.get('/static/register', (req, res) => {
+    res.render('register', {
+        rutaCSS: "register",
+        rutaJS: "register"
+    });
+});
+
