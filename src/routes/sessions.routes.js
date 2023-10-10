@@ -1,6 +1,8 @@
 import { Router } from "express";
 import userModel from "../models/users.models.js";
 import passport from 'passport';
+import { passportError } from '../utils/messageErrors.js';
+import { generateToken } from '../utils/jwt.js';
 
 const routerSession = Router();
 
@@ -17,7 +19,12 @@ routerSession.post('/login', passport.authenticate('login'), async (req, res) =>
 			email: req.user.email,
 		};
 
-		res.status(200).send({ payload: req.user });
+		const token = generateToken(req.user); // se genera el token con el usuario
+		res.cookie('jwtCookie', token, {
+			maxAge: 43200000,
+		});
+
+		return res.redirect('../../static/products');
 	} catch (error) {
 		res.status(500).send({ mensaje: `Error al iniciar sesión ${error}` });
 	}
@@ -41,7 +48,8 @@ routerSession.get('/logout', (req, res) => {
 	if (req.session) {
 		req.session.destroy();
 	}
-
+	
+	res.clearCookie('jwtCookie');
 	res.status(200).send({ resultado: 'Login eliminado', message: 'Logout' });
 });
 

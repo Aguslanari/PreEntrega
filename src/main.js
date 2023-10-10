@@ -4,16 +4,10 @@ import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
 import { __dirname } from './path.js';
 import path from 'path';
+import router from './routes/index.routes.js';
 
 import messageModel from './models/message.models.js';
 import productModel from './models/products.models.js';
-
-import routerProd from './routes/products.routes.js';
-import routerCart from './routes/carts.routes.js';
-import routerMessage from './routes/messages.routes.js';
-import routerSession from './routes/sessions.routes.js';
-import routerUser from './routes/users.routes.js';
-import routerHandlebars from './routes/handlebars.routes.js';
 
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -87,13 +81,4 @@ io.on('connection', socket => {
 });
 
 // Routes
-app.use('/static', express.static(path.join(__dirname, '/public')));
-app.use('/static', routerHandlebars);
-
-
-app.use('/api/products', routerProd);
-app.use('/api/carts', routerCart);
-app.use('/api/messages', routerMessage);
-app.use('/api/users', routerUser)
-app.use('/api/sessions', routerSession)
-
+app.use('/', router);
