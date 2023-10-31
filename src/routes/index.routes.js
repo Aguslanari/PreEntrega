@@ -5,10 +5,12 @@ import routerMessage from './messages.routes.js';
 import routerSession from './sessions.routes.js';
 import routerUser from './users.routes.js';
 import routerHandlebars from './handlebars.routes.js';
+import routerTicket from './tickets.routes.js';
 
 
 const router = Router();
 
+router.use('/api/tickets', routerTicket);
 router.use('/api/products', routerProd);
 router.use('/api/messages', routerMessage);
 router.use('/api/cart', routerCart);
