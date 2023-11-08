@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import productsController from '../controllers/products.controller.js';
+import createProducts from '../controllers/mocks.controller.js';
 
 const routerProd = Router();
 

@@ -42,6 +42,15 @@ const getProduct = async (req, res) => {
 const postProduct = async (req, res) => {
 	const { title, description, code, price, stock, category } = req.body;
 
+	if ((!title, !description, !code, !price, !stock, !category)) {
+		CustomError.createError({
+			name: 'Error de creación de producto',
+			cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
+			message: 'Error al crear producto',
+			code: EErrors.MISSING_OR_INVALID_PRODUCT_DATA,
+		});
+	}
+
 	try {
 		const product = await productModel.create({
 			title,
@@ -67,6 +76,15 @@ const postProduct = async (req, res) => {
 const putProduct = async (req, res) => {
 	const { pid } = req.params;
 	const { title, description, code, price, stock, category } = req.body;
+
+	if ((!title, !description, !code, !price, !stock, !category)) {
+		CustomError.createError({
+			name: 'Error de actualización de producto',
+			cause: generateProductErrorInfo({ title, description, code, price, stock, category }),
+			message: 'Error al actualizar producto',
+			code: EErrors.MISSING_OR_INVALID_DATA,
+		});
+	}
 
 	try {
 		const product = await productModel.findByIdAndUpdate(pid, {
