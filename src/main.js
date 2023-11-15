@@ -8,6 +8,7 @@ import router from './routes/index.routes.js';
 
 import messageModel from './models/message.models.js';
 import productModel from './models/products.models.js';
+import { addLogger } from './utils/logger.js';
 
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
@@ -20,6 +21,7 @@ import { app, io } from './config/config.js';
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(addLogger);
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.resolve(__dirname, './views'));
