@@ -23,6 +23,44 @@ const getCart = async (req, res) => {
 	}
 };
 
+const purchaseCart = async (req, res) => {
+	const { cid } = req.params;
+	try {
+		const cart = await cartModel.findById(cid);
+		const products = await productModel.find();
+
+		if (cart) {
+			const user = await userModel.find({ cart: cart._id });
+			const email = user[0].email;
+			let amount = 0;
+			const purchaseItems = [];
+			cart.products.forEach(async item => {
+				
+				const product = products.find(prod => prod._id == item.id_prod.toString());
+				
+				if (product.stock >= item.quantity) {
+					amount += product.price * item.quantity;
+					product.stock -= item.quantity;
+					await product.save();
+					purchaseItems.push(product.title);
+				}
+			});
+			if (user.rol === 'premium') {
+				amount *= 0.9;
+			}
+			await cartModel.findByIdAndUpdate(cid, { products: [] });
+			res.redirect(
+				`http://localhost:8080/api/tickets/create?amount=${amount}&email=${email}`
+			);
+		} else {
+			res.status(404).send({ resultado: 'Not Found', message: cart });
+		}
+	} catch (error) {
+		res.status(400).send({ error: `Error al consultar carrito: ${error}` });
+	}
+};
+
+
 const postCart = async (req, res) => {
 	try {
 		const respuesta = await cartModel.create({});
@@ -157,6 +195,7 @@ const cartsController = {
 	putQuantity,
 	deleteCart,
 	deleteProductFromCart,
+	purchaseCart
 };
 
 export default cartsController;
