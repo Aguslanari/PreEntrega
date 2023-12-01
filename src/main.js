@@ -16,6 +16,8 @@ import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import initializePassport from './config/passport.js';
 import { app, io } from './config/config.js';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express';
 
 //Middlewares
 app.use(express.json());
@@ -43,6 +45,20 @@ app.use(session({
 initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
+
+const swaggerOptions = {
+	definition: {
+		openapi: '3.1.0',
+		info: {
+			title: 'API BackEnd',
+			description: 'Documentacion api backend CoderHouse 2023',
+		},
+	},
+	apis: [`${__dirname}/docs/**/*.yaml`],
+};
+
+const specs = swaggerJSDoc(swaggerOptions);
+app.use('/apidocs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 // Conexión con socket.io
 io.on('connection', socket => {

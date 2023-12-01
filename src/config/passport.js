@@ -5,7 +5,7 @@ import jwt, { ExtractJwt } from 'passport-jwt';
 import { createHash, validatePassword } from '../utils/bcrypt.js';
 import userModel from '../models/users.models.js';
 import { generateUserErrorInfo } from '../services/errors/info.js';
-import CustomError from '../services/errors/CustomError.js';
+import CustomError from '../services/errors/CustomErrors.js';
 import EErrors from '../services/errors/enums.js';
 
 const LocalStrategy = local.Strategy;
