@@ -1,10 +1,15 @@
 {
     "scripts": {
-        "dev": "nodemon src/main.js"
+        "dev": "nodemon src/main.js",
+        "testProducts": "mocha test/Products.test.js",
+        "testCarts": "mocha test/Carts.test.js",
+        "testProductsChai": "mocha test/ProductsChai.test.js",
+        "testSuper": "mocha test/Supertest.test.js"
     },
     "type": "module",
     "dependencies": {
         "@faker-js/faker": "^8.3.1",
+        "assert": "^2.1.0",
         "bcrypt": "^5.1.1",
         "connect-mongo": "^5.0.0",
         "cookie-parser": "^1.4.6",
@@ -27,6 +32,9 @@
         "winston": "^3.11.0"
     },
     "devDependencies": {
-        "nodemon": "^3.0.1"
+        "chai": "^4.3.10",
+        "mocha": "^10.2.0",
+        "nodemon": "^3.0.1",
+        "supertest": "^6.3.3"
     }
 }
