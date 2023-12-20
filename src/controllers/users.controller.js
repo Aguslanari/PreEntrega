@@ -72,6 +72,25 @@ const resetPassword = async (req, res) => {
 	}
 };
 
-const usersController = { getUser, postUser, recoveryPassword, resetPassword };
+const uploadDocuments = async (req, res) => {
+	console.log(req.files);
+	try {
+		const uid = req.params.uid;
+		const newDocuments = req.files.map(file => ({
+			name: file.originalname,
+			reference: file.path,
+		}));
+
+		const user = await userModel.findById(uid);
+		user.documents.push(...newDocuments);
+		await user.save();
+
+		res.status(200).send({ message: 'Documento subido exitosamente' });
+	} catch (error) {
+		res.status(500).send('Error al cargar archivo');
+	}
+};
+
+const usersController = { getUser, postUser, recoveryPassword, resetPassword, uploadDocuments };
 
 export default usersController;

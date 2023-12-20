@@ -101,6 +101,7 @@ const putProductToCart = async (req, res) => {
 const putQuantity = async (req, res) => {
 	const { cid, pid } = req.params;
 	const { quantity } = req.body;
+	const product = await productModel.findById(pid);
 
 	try {
 		const cart = await cartModel.findById(cid);
@@ -108,6 +109,9 @@ const putQuantity = async (req, res) => {
 		if (cart) {
 			const productExists = cart.products.find(prod => prod.id_prod == pid);
 			if (productExists) {
+				if (product.stock < productExists.quantity + quantity) {
+					res.status(400).send({ error: `No hay stock suficiente` });
+				}
 				productExists.quantity += quantity;
 			} else {
 				res.status(404).send({ resultado: 'Product Not Found', message: cart });
@@ -122,6 +126,7 @@ const putQuantity = async (req, res) => {
 		res.status(400).send({ error: `Error al agregar productos: ${error}` });
 	}
 };
+
 const putProductsToCart = async (req, res) => {
 	const { cid, pid } = req.params;
 

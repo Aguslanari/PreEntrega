@@ -1,7 +1,16 @@
 import { Schema, model } from "mongoose";
 
+const fileSchema = new Schema(
+	{
+		name: String,
+		reference: String,
+	},
+	{ _id: false }
+);
+
+
 const userSchema = new Schema({
-    first_name: {
+	first_name: {
 		type: String,
 		required: true,
 	},
@@ -30,6 +39,8 @@ const userSchema = new Schema({
 		type: String,
 		required: true,
 	},
+	documents: [fileSchema],
+	last_connection: Date,
 })
 
 userSchema.pre('save', async function (next) {

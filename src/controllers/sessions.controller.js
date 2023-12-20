@@ -1,4 +1,5 @@
 import { generateToken } from "../utils/jwt.js";
+import userModel from '../models/users.models.js';
 
 const postSession = async (req, res) => {
 	try {
@@ -6,12 +7,16 @@ const postSession = async (req, res) => {
 			return res.status(401).send({ mensaje: 'Invalidate user' });
 		}
 
-		const token = generateToken(req.user); 
+		const token = generateToken(req.user);
 		res.cookie('jwtCookie', token, {
 			maxAge: 43200000,
 		});
 
-		return res.redirect('../../static/products');
+		const user = userModel.findOne({ email: req.user.email });
+		user.last_connection = Date.now();
+		await user.save();
+
+		return res.status(200).send('Login exitoso');
 	} catch (error) {
 		res.status(500).send({ mensaje: `Error al iniciar sesión ${error}` });
 	}
@@ -30,9 +35,14 @@ const getGithubSession = async (req, res) => {
 	res.status(200).send({ mensaje: 'Sesión creada' });
 };
 
-const getLogout = (req, res) => {
+const getLogout = async (req, res) => {
 	if (req.session) {
 		req.session.destroy();
+	}
+	if (req.user) {
+		const user = userModel.findOne({ email: req.user.email });
+		user.last_connection = Date.now();
+		await user.save();
 	}
 	res.clearCookie('jwtCookie');
 	res.status(200).send({ resultado: 'Login eliminado', message: 'Logout' });
